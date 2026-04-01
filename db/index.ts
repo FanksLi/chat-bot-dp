@@ -1,18 +1,17 @@
-
 import 'dotenv/config';
 import { drizzle } from 'drizzle-orm/postgres-js';
-import { and, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { chatsTable, messagesTable } from './schema';
 
 const db = drizzle(process.env.DATABASE_URL!);
 
 
-export async function createChat(title: string, userId: string, model: string) {
+export async function createChat(title: string, model: string) {
 
     try {
         const [newChat] = await db.insert(chatsTable).values({
             title,
-            userId,
+            userId: 'default',
             model
         }).returning();
         return newChat;
@@ -23,12 +22,12 @@ export async function createChat(title: string, userId: string, model: string) {
 }
 
 
-export async function getChat(chatId: number, userId: string) {
+export async function getChat(chatId: number) {
 
     try {
         const chats = await db.select()
             .from(chatsTable)
-            .where(and(eq(chatsTable.id, chatId), eq(chatsTable.userId, userId)));
+            .where(eq(chatsTable.id, chatId));
 
         if (chats.length === 0) {
             return null;
@@ -40,12 +39,10 @@ export async function getChat(chatId: number, userId: string) {
     }
 }
 
-export async function getChats(userId: string) {
+export async function getChats() {
 
     try {
-        const chats = await db.select().from(chatsTable)
-        .where(eq(chatsTable.userId, userId));
-        console.log("🚀 ~ getChats ~ chats:", chats)
+        const chats = await db.select().from(chatsTable);
 
         return chats;
     } catch(err) {
@@ -84,5 +81,16 @@ export async function getMessages(chatId: number) {
     } catch(err) {
         console.error(err);
         return null;
+    }
+}
+
+export async function deleteChat(chatId: number) {
+    try {
+        await db.delete(messagesTable).where(eq(messagesTable.chatId, chatId));
+        await db.delete(chatsTable).where(eq(chatsTable.id, chatId));
+        return true;
+    } catch(err) {
+        console.error(err);
+        return false;
     }
 }
