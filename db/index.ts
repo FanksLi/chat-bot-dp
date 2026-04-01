@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { drizzle } from 'drizzle-orm/postgres-js';
-import { eq } from 'drizzle-orm';
+import { eq, asc } from 'drizzle-orm';
 import { chatsTable, messagesTable } from './schema';
 
 const db = drizzle(process.env.DATABASE_URL!);
@@ -61,6 +61,7 @@ export async function createMessage(chatId: number, content: string, role: strin
             content,
             role,
             chatId,
+            createdAt: Date.now(),
         }).returning();
 
         return newMessage;
@@ -75,7 +76,8 @@ export async function getMessages(chatId: number) {
 
     try {
         const messages = await db.select().from(messagesTable)
-        .where(eq(messagesTable.chatId, chatId));
+        .where(eq(messagesTable.chatId, chatId))
+        .orderBy(asc(messagesTable.createdAt));
 
         return messages;
     } catch(err) {

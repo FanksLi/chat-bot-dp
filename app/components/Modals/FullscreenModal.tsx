@@ -1,6 +1,6 @@
 "use client";
 
-import { memo } from "react";
+import { memo, useEffect, useRef } from "react";
 import { Modal, Input, Button, Typography } from "antd";
 import { FullscreenExitOutlined, SendOutlined } from "@ant-design/icons";
 
@@ -19,6 +19,14 @@ interface Props {
 }
 
 const FullscreenModal = memo(function FullscreenModal({ open, input, status, chatId, onClose, onInputChange, onKeyDown, onSend }: Props) {
+  const textareaRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (open && status === "ready") {
+      setTimeout(() => textareaRef.current?.focus?.(), 100);
+    }
+  }, [open, status]);
+
   return (
     <Modal
       open={open}
@@ -52,6 +60,7 @@ const FullscreenModal = memo(function FullscreenModal({ open, input, status, cha
           </div>
         </div>
         <TextArea
+          ref={textareaRef}
           value={input}
           onChange={(e) => onInputChange(e.target.value)}
           onKeyDown={onKeyDown}

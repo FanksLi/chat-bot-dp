@@ -23,6 +23,7 @@ export default function HomeContent() {
   const chatId = searchParams.get("chatId");
   const boxRef = useRef<HTMLDivElement>(null);
   const locked = useRef(false);
+  const pendingMessage = useRef<string | null>(null);
 
   const { chats, queryChats } = useChatList();
   const [loading, setLoading] = useState(false);
@@ -31,14 +32,18 @@ export default function HomeContent() {
   const [collapsed, setCollapsed] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [chatToDelete, setChatToDelete] = useState<ChatItem | null>(null);
+  const [focusKey, setFocusKey] = useState(0);
 
   const { messages, sendMessage, status, setMessages } = useChat({
     transport: new DefaultChatTransport({
       api: "/api/chat",
+      prepareSendMessagesRequest: ({ body, messages }) => ({
+        body: {
+          messages,
+          ...body,
+        },
+      }),
     }),
-    onFinish: () => {
-      refreshBox();
-    },
   });
 
   const initChat = useCallback(async () => {
@@ -79,7 +84,20 @@ export default function HomeContent() {
         }),
       }).then((res) => res.json());
       if (res.length === 0) {
-        initChat();
+        if (pendingMessage.current) {
+          const msg = pendingMessage.current;
+          pendingMessage.current = null;
+          sendMessage(
+            { text: msg },
+            {
+              body: {
+                chatId: Number(chatId),
+              },
+            }
+          );
+        } else {
+          initChat();
+        }
         return;
       }
       const initialMessages = res.map((msg: { id: number; content: string; role: string }) => ({
@@ -94,7 +112,7 @@ export default function HomeContent() {
     } finally {
       setLoading(false);
     }
-  }, [chatId, setMessages, initChat]);
+  }, [chatId, setMessages, initChat, sendMessage]);
 
   useEffect(() => {
     if (chatId) {
@@ -125,6 +143,7 @@ export default function HomeContent() {
         }),
       }).then((res) => res.json());
       if (res?.id) {
+        pendingMessage.current = title.trim();
         router.push(`/?chatId=${res.id}`);
         queryChats();
       }
@@ -250,6 +269,7 @@ export default function HomeContent() {
           input={input}
           status={status}
           chatId={chatId}
+          focusKey={focusKey}
           onInputChange={setInput}
           onKeyDown={handleKeyDown}
           onSend={handleSend}
@@ -262,7 +282,10 @@ export default function HomeContent() {
         input={input}
         status={status}
         chatId={chatId}
-        onClose={() => setFullscreen(false)}
+        onClose={() => {
+          setFullscreen(false);
+          setFocusKey((k) => k + 1);
+        }}
         onInputChange={setInput}
         onKeyDown={handleKeyDown}
         onSend={handleSend}
