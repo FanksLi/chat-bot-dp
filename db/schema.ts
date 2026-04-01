@@ -27,6 +27,7 @@ export const messagesTable = pgTable('messages', {
     chatId: integer('chat_id').references(() => chatsTable.id),
     role: text('role').notNull(),
     content: text('content').notNull(),
+    createdAt: integer('created_at').notNull(),
 })
 
 export type ChatModel = typeof chatsTable.$inferSelect;
