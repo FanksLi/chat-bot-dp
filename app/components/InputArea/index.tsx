@@ -1,6 +1,6 @@
 "use client";
 
-import { memo } from "react";
+import { memo, useEffect, useRef } from "react";
 import { Input, Button } from "antd";
 import { SendOutlined, FullscreenOutlined } from "@ant-design/icons";
 
@@ -10,19 +10,35 @@ interface Props {
   input: string;
   status: string;
   chatId: string | null;
+  focusKey?: number;
   onInputChange: (value: string) => void;
   onKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
   onSend: () => void;
   onFullscreen: () => void;
 }
 
-const InputArea = memo(function InputArea({ input, status, chatId, onInputChange, onKeyDown, onSend, onFullscreen }: Props) {
+const InputArea = memo(function InputArea({ input, status, chatId, focusKey, onInputChange, onKeyDown, onSend, onFullscreen }: Props) {
+  const textareaRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (status === "ready") {
+      textareaRef.current?.focus?.();
+    }
+  }, [status, chatId]);
+
+  useEffect(() => {
+    if (focusKey !== undefined) {
+      setTimeout(() => textareaRef.current?.focus?.(), 350);
+    }
+  }, [focusKey]);
+
   return (
     <div className="p-4 border-t border-gray-100 bg-white">
       <div className="max-w-3xl mx-auto">
         <div className="flex gap-2 items-center">
           <div className="flex-1 relative" style={{ position: 'relative' }}>
             <TextArea
+              ref={textareaRef}
               value={input}
               onChange={(e) => onInputChange(e.target.value)}
               onKeyDown={onKeyDown}

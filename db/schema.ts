@@ -1,5 +1,4 @@
-import { integer, pgTable, varchar, serial, text } from 'drizzle-orm/pg-core';
-
+import { integer, pgTable, varchar, serial, text, bigint } from 'drizzle-orm/pg-core';
 
 
 
@@ -27,7 +26,7 @@ export const messagesTable = pgTable('messages', {
     chatId: integer('chat_id').references(() => chatsTable.id),
     role: text('role').notNull(),
     content: text('content').notNull(),
-    createdAt: integer('created_at').notNull(),
+    createdAt: bigint('created_at', { mode: 'number' }).notNull(),
 })
 
 export type ChatModel = typeof chatsTable.$inferSelect;
