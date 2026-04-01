@@ -11,15 +11,17 @@
   "dependencies": {
     "@ai-sdk/deepseek": "^1.0.20",
     "@ai-sdk/react": "^2.0.60",
-    "@clerk/nextjs": "^6.33.1",
+    "@ant-design/icons": "^6.1.1",
     "ai": "^5.0.60",
-    "classnames": "^2.5.1",
+    "antd": "^6.3.5",
     "dotenv": "^17.2.3",
     "drizzle-orm": "^0.44.6",
-    "next": "15.5.4",
+    "next": "^16.2.2",
     "postgres": "^3.4.7",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -29,7 +31,7 @@
     "@types/react-dom": "^19",
     "drizzle-kit": "^0.31.5",
     "eslint": "^9",
-    "eslint-config-next": "15.5.4",
+    "eslint-config-next": "^16.2.2",
     "tailwindcss": "^4",
     "tsx": "^4.20.6",
     "typescript": "^5"

@@ -3,7 +3,6 @@ import { convertToModelMessages, streamText, UIMessage } from 'ai';
 import { createMessage } from "@/db";
 
 
-// Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
 
 const deepseek = createDeepSeek({
@@ -11,9 +10,7 @@ const deepseek = createDeepSeek({
 });
 
 export async function POST(req: Request) {
-  const { messages, chatId, userId }: { messages: UIMessage[], chatId: number, userId: string } = await req.json();
-  console.log("🚀 ~ POST ~ userId:", userId)
-  if(!userId) return new Response('Unauthorized', { status: 401 });
+  const { messages, chatId }: { messages: UIMessage[], chatId: number } = await req.json();
 
   const lastMessage = messages[messages.length - 1];
 
